@@ -1,2 +1,7 @@
 rootProject.name = 'kapp'
+new File(rootDir, 'module').eachDir { dir ->
+    include dir.name
+    println("Include " + dir.name)
+    project(":${dir.name}").projectDir = new File(rootDir, "module/${dir.name}")
+}
 

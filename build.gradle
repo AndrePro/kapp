@@ -16,3 +16,31 @@ dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.3.11'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
+
+allprojects {
+    apply plugin: 'java'
+}
+
+ext {
+    root = buildscript.sourceFile.parentFile
+    srcFolders = ['BC', 'KZ']
+}
+
+sourceSets {
+    main {
+        java {
+            srcFolders.each { sd ->
+                logger.println("Add srcDir ${root}/${sd}/source/java")
+                srcDir "${root}/${sd}/source/java"
+            }
+        }
+
+    }
+    test {
+        java {
+            srcFolders.each { sd ->
+                srcDir "${root}/${sd}/kunit/java"
+            }
+        }
+    }
+}
