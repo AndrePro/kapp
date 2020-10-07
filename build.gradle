@@ -1,6 +1,7 @@
 plugins {
     id 'groovy'
     id 'java'
+    id "org.sonarqube" version "3.0"
 }
 
 group 'com.kyriba.protasenya'
@@ -18,6 +19,7 @@ dependencies {
 }
 
 allprojects {
+    println"${it.name}-${it.path}"
     apply plugin: 'java'
     
     dependencies {
@@ -40,6 +42,7 @@ sourceSets {
         java {
             srcFolders.each { sd ->
                 logger.println("Add srcDir ${root}/${sd}/source/java")
+                logger.println(buildscript.sourceFile.parentFile)
                 srcDir "${root}/${sd}/source/java"
             }
         }

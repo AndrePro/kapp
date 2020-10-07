@@ -1,4 +1,6 @@
 rootProject.name = 'kapp'
+println("root dir - ${rootDir}")
+//include 'module', 'module:module-one', 'module:module-two'
 new File(rootDir, 'module').eachDir { dir ->
     include dir.name
     println("Include " + dir.name)
