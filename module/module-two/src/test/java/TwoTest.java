@@ -1,6 +1,11 @@
+import org.junit.Assert;
+import org.junit.Test;
+
 public class TwoTest {
 
-    public static void main(String[] args) {
-        System.out.println("Test Two");
+    @Test
+    public void emailTest() {
+        Two two = new Two();
+        Assert.assertEquals("foo", two.foo());
     }
 }

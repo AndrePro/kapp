@@ -1,6 +1,7 @@
 plugins {
     id 'groovy'
     id 'java'
+    id "org.sonarqube" version "3.0"
 }
 
 group 'com.kyriba.protasenya'
@@ -18,16 +19,23 @@ dependencies {
 }
 
 allprojects {
+    println "${it.name}-${it.path}"
     apply plugin: 'java'
-    
+    apply plugin: 'jacoco'
+
+
+    jacoco {
+        toolVersion = '0.8.2'
+    }
+
     dependencies {
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }
-    
+
     repositories {
         mavenCentral()
     }
-    
+
 }
 
 ext {
@@ -40,6 +48,7 @@ sourceSets {
         java {
             srcFolders.each { sd ->
                 logger.println("Add srcDir ${root}/${sd}/source/java")
+                logger.println(buildscript.sourceFile.parentFile)
                 srcDir "${root}/${sd}/source/java"
             }
         }
@@ -51,5 +60,41 @@ sourceSets {
                 srcDir "${root}/${sd}/kunit/java"
             }
         }
+    }
+}
+
+def allTestCoverageFile = "${rootDir}/build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml"
+
+task codeCoverageReport(type: JacocoReport) {
+
+    // Gather execution data from all subprojects
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+    // Add all relevant sourcesets from the subprojects
+    allprojects.each {
+        println("sourceSet" + it.sourceSets.main)
+        sourceSets(it.sourceSets.main)
+    }
+
+    reports {
+        xml.enabled true
+        html.enabled true
+        csv.enabled false
+    }
+}
+
+// always run the tests before generating the report
+codeCoverageReport.dependsOn {
+    allprojects*.test
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "kappMy"
+        property "sonar.verbose", true
+        property "sonar.projectName", "kappMy"
+        property "sonar.coverage.jacoco.xmlReportPaths", allTestCoverageFile
+        property "sonar.sources", "src/main,BC/source"
+        property "sonar.tests", "src/test"
     }
 }
