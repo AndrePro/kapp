@@ -90,9 +90,9 @@ codeCoverageReport.dependsOn {
 sonarqube {
     println "sonar.coverage.jacoco.xmlReportPaths - $allTestCoverageFile"
     properties {
-        property "sonar.projectKey", "kappMy"
+        property "sonar.projectKey", "kapp"
         property "sonar.verbose", true
-        property "sonar.projectName", "kappMy"
+        property "sonar.projectName", "kapp"
         property "sonar.coverage.jacoco.xmlReportPaths", allTestCoverageFile
         property "sonar.projectVersion", "1.0.1"
     }
