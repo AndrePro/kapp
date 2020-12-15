@@ -1,0 +1,23 @@
+allprojects {
+    afterEvaluate {
+        def srcDirs = project.sourceSets.main.java.srcDirs
+                .findAll { it.exists() }
+                .collect { it.path }
+                .join(",")
+
+        def srcTestDirs = project.sourceSets.test.java.srcDirs
+                .findAll { it.exists() }
+                .collect { it.path }
+                .join(",")
+
+        println "${project.name} sonar srcDirs - ${srcDirs}"
+        println "${project.name} sonar srcTestDirs - ${srcTestDirs}"
+
+        sonarqube {
+            properties {
+                property "sonar.sources", srcDirs
+                property "sonar.tests", srcTestDirs
+            }
+        }
+    }
+}

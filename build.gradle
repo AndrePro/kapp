@@ -2,10 +2,8 @@ plugins {
     id 'groovy'
     id 'java'
     id "org.sonarqube" version "3.0"
+    id "com.dorongold.task-tree" version "1.5"
 }
-
-group 'com.kyriba.protasenya'
-version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
@@ -20,6 +18,7 @@ dependencies {
 
 allprojects {
     println "${it.name}-${it.path}"
+    println "build dir - $it.buildDir"
     apply plugin: 'java'
     apply plugin: 'jacoco'
 
@@ -31,11 +30,11 @@ allprojects {
     dependencies {
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }
-    
+
     repositories {
         mavenCentral()
     }
-    
+
 }
 
 ext {
@@ -63,6 +62,8 @@ sourceSets {
     }
 }
 
+//apply from: "$projectDir/sonarbuild.gradle"
+
 def allTestCoverageFile = "${rootDir}/build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml"
 
 task codeCoverageReport(type: JacocoReport) {
@@ -72,10 +73,8 @@ task codeCoverageReport(type: JacocoReport) {
 
     // Add all relevant sourcesets from the subprojects
     allprojects.each {
-        println("sourceSet" + it.sourceSets.main)
         sourceSets(it.sourceSets.main)
     }
-
     reports {
         xml.enabled true
         html.enabled true
@@ -89,12 +88,60 @@ codeCoverageReport.dependsOn {
 }
 
 sonarqube {
+    println "sonar.coverage.jacoco.xmlReportPaths - $allTestCoverageFile"
     properties {
         property "sonar.projectKey", "kappMy"
         property "sonar.verbose", true
         property "sonar.projectName", "kappMy"
         property "sonar.coverage.jacoco.xmlReportPaths", allTestCoverageFile
-        property "sonar.sources", "src/main,BC/source"
-        property "sonar.tests", "src/test"
+        property "sonar.projectVersion", "1.0.1"
     }
 }
+
+
+task printInfo {
+    doLast {
+        allprojects.each {
+            println("${it.name} sourceSet ${it.sourceSets.main.java.srcDirs}")
+            it.sourceSets.main.java.srcDirs.each {
+                println(it.path - projectDir - '\\')
+            }
+            it.sourceSets.main.java.sourceDirectories.asFileTree.visit {
+                //println(it.path)
+            }
+            //println("${it.name} outputDir ${it.sourceSets.main.java.outputDir}")
+        }
+    }
+}
+
+task printSourceSetInformation {
+    doLast {
+        sourceSets.each { srcSet ->
+            println "[" + srcSet.name + "]"
+            print "-->Source directories: " + srcSet.allJava.srcDirs + "\n"
+            print "-->Output directories: " + srcSet.output.classesDirs.files + "\n"
+            println ""
+        }
+    }
+}
+
+task printInfo2 {
+    doLast {
+
+        println project.sourceSets.test.allJava.srcDirs
+                .collect { it.path }
+                .join(",")
+        
+        println project.sourceSets.main.java.srcDirs
+                .collect { it.path }
+                .join(",")
+
+        /*println project.sourceSets.test.srcDirs
+                .collect { it.path }
+                .join(",")*/
+    }
+}
+
+
+apply from: "$projectDir/sonarbuild.gradle"
+    
